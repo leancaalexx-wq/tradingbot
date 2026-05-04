@@ -43,6 +43,7 @@ class BotConfig:
     max_seconds_to_close: int = 90
     poll_seconds: float = 5.0
     request_timeout_seconds: float = 10.0
+    event_log_path: str = "runtime/bot-events.jsonl"
     live_trading: bool = False
     dry_run: bool = True
     private_key: str | None = None
@@ -68,6 +69,7 @@ class BotConfig:
             request_timeout_seconds=_float_env(
                 "REQUEST_TIMEOUT_SECONDS", str(cls.request_timeout_seconds)
             ),
+            event_log_path=os.getenv("BOT_EVENT_LOG", cls.event_log_path),
             live_trading=live_trading,
             dry_run=not live_trading or _bool_env("DRY_RUN", "true"),
             private_key=os.getenv("POLYMARKET_PRIVATE_KEY"),

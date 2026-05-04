@@ -36,6 +36,24 @@ polymarket-btc-bot --once
 polymarket-btc-bot --stake 1 --poll-seconds 5
 ```
 
+## Local dashboard
+
+The bot writes structured events to `runtime/bot-events.jsonl` by default. Start the dashboard in a
+second terminal to watch paper trades, skipped markets, current asks, and strategy settings:
+
+```bash
+polymarket-btc-dashboard --host 0.0.0.0 --port 8080
+```
+
+Then open `http://localhost:8080`. The page auto-refreshes every five seconds.
+
+If you want a different event file:
+
+```bash
+BOT_EVENT_LOG=runtime/my-bot-events.jsonl polymarket-btc-bot --optimized-profile --stake 100
+polymarket-btc-dashboard --event-log runtime/my-bot-events.jsonl
+```
+
 ## Deploy with Docker
 
 Paper-mode deployment is the default and does not use real funds:
@@ -141,6 +159,7 @@ Environment variables:
 | `MIN_SECONDS_TO_CLOSE` | `15` | Do not enter in the final seconds below this threshold |
 | `MAX_SECONDS_TO_CLOSE` | `90` | Start looking only this close to market expiry |
 | `POLL_SECONDS` | `5` | Polling interval |
+| `BOT_EVENT_LOG` | `runtime/bot-events.jsonl` | JSONL event log used by the local dashboard |
 | `LIVE_TRADING` / `POLYMARKET_LIVE` | `false` | Enables live mode intent |
 | `DRY_RUN` | `true` | Must be `false` for live execution |
 | `POLYMARKET_PRIVATE_KEY` | unset | Wallet/private key for py-clob-client |

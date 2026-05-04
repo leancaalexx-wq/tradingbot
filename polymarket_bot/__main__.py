@@ -10,6 +10,7 @@ from decimal import Decimal
 
 from .backtest import Backtester, print_report
 from .config import BotConfig, apply_optimized_profile
+from .dashboard import run_dashboard
 from .optimizer import StrategyOptimizer, print_optimization_report
 from .runner import BotRunner
 
@@ -42,6 +43,22 @@ def build_parser() -> argparse.ArgumentParser:
         "--optimized-profile",
         action="store_true",
         help="Use the bundled optimized BTC 5m profile from the latest walk-forward search.",
+    )
+    parser.add_argument(
+        "--dashboard",
+        action="store_true",
+        help="Run the local web dashboard instead of the trading loop.",
+    )
+    parser.add_argument(
+        "--dashboard-host",
+        default="127.0.0.1",
+        help="Dashboard bind host.",
+    )
+    parser.add_argument(
+        "--dashboard-port",
+        type=int,
+        default=8765,
+        help="Dashboard bind port.",
     )
     parser.add_argument(
         "--backtest-days",
@@ -124,6 +141,14 @@ def main(argv: list[str] | None = None) -> int:
             workers=args.backtest_workers,
         )
         print_optimization_report(report)
+        return 0
+
+    if args.dashboard:
+        run_dashboard(
+            event_log_path=config.event_log_path,
+            host=args.dashboard_host,
+            port=args.dashboard_port,
+        )
         return 0
 
     runner = BotRunner(config)

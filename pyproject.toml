@@ -19,6 +19,7 @@ live = ["py-clob-client>=0.34.6"]
 
 [project.scripts]
 polymarket-btc-bot = "polymarket_bot.__main__:main"
+polymarket-btc-dashboard = "polymarket_bot.dashboard:main"
 
 [tool.setuptools.packages.find]
 include = ["polymarket_bot*"]
