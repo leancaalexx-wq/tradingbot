@@ -36,6 +36,30 @@ polymarket-btc-bot --once
 polymarket-btc-bot --stake 1 --poll-seconds 5
 ```
 
+## Deploy with Docker
+
+Paper-mode deployment is the default and does not use real funds:
+
+```bash
+cp .env.example .env
+docker compose up -d --build polymarket-btc-bot
+docker compose logs -f polymarket-btc-bot
+```
+
+The compose command runs the bundled optimized profile with `STAKE_USDC=100` by default, but
+keeps `LIVE_TRADING=false` and `DRY_RUN=true`.
+
+Live deployment is intentionally a separate profile:
+
+```bash
+LIVE_TRADING=true DRY_RUN=false \
+POLYMARKET_PRIVATE_KEY=... \
+POLYMARKET_FUNDER_ADDRESS=... \
+docker compose --profile live up -d --build polymarket-btc-bot-live
+```
+
+Only use live mode after confirming paper fills and Polymarket balances/allowances.
+
 ## Backtest
 
 Run the same entry rules against recent resolved BTC 5-minute markets:

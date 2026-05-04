@@ -1,0 +1,17 @@
+services:
+  polymarket-btc-bot:
+    build: .
+    image: polymarket-btc-scalper:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    command: ["--optimized-profile", "--stake", "${STAKE_USDC:-1}"]
+
+  polymarket-btc-bot-live:
+    profiles: ["live"]
+    build: .
+    image: polymarket-btc-scalper:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    command: ["--optimized-profile", "--stake", "${STAKE_USDC:-1}", "--live"]
