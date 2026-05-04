@@ -227,5 +227,20 @@ POLYMARKET_FUNDER_ADDRESS=... \
 polymarket-btc-bot --live
 ```
 
+For the current champion profile, prefer the guarded launcher:
+
+```bash
+export POLYMARKET_PRIVATE_KEY='...'
+export POLYMARKET_FUNDER_ADDRESS='0x...'
+export LIVE_TRADING=true
+export DRY_RUN=false
+export STAKE_USDC=100
+scripts/start_live_champion.sh
+```
+
+The script refuses to start if the private key, funder address, `LIVE_TRADING=true`, or
+`DRY_RUN=false` are missing. Never commit real private keys; set them only as environment variables
+or through your host's secret manager.
+
 Use small stakes first. This bot does not predict BTC directly; it follows price direction already
 visible in the Polymarket order book and accepts the risk that the market reverses before close.
