@@ -52,6 +52,57 @@ size was fillable at that price.
 Use `--backtest-workers` to control concurrent historical price requests if the API is slow or
 rate-limited.
 
+## Optimize parameters
+
+Search a parameter grid on recent history and validate the best candidate on the trailing holdout
+period:
+
+```bash
+polymarket-btc-bot --optimize --backtest-days 7 --validation-days 2 --capital 1000 --stake 100
+```
+
+The bot also includes the latest bundled optimized profile found during development:
+
+```bash
+polymarket-btc-bot --optimized-profile --backtest --backtest-days 7 --capital 1000 --stake 100
+polymarket-btc-bot --optimized-profile --stake 100
+```
+
+Bundled profile:
+
+| Setting | Value |
+| --- | --- |
+| `MIN_ENTRY_PRICE` | `0.70` |
+| `MAX_ENTRY_PRICE` | `0.90` |
+| `MIN_EXPECTED_PROFIT_USDC` | `0.05` |
+| `MIN_SECONDS_TO_CLOSE` | `5` |
+| `MAX_SECONDS_TO_CLOSE` | `180` |
+
+Development walk-forward run with 1000 USDC starting capital and 100 USDC stake:
+
+- Train window: +4997.23 USDC, 997 trades, 83.45% win rate.
+- Validation holdout: +2131.20 USDC, 407 trades, 84.77% win rate.
+- Full 7-day backtest with bundled profile: +7128.44 USDC, 1404 trades, 83.83% win rate.
+
+Optimization is historical curve fitting. Always compare train and validation results, then run
+paper mode before using live funds.
+
+Latest bundled profile:
+
+| Variable | Value |
+| --- | --- |
+| `MIN_ENTRY_PRICE` | `0.70` |
+| `MAX_ENTRY_PRICE` | `0.90` |
+| `MIN_EXPECTED_PROFIT_USDC` | `0.05` |
+| `MIN_SECONDS_TO_CLOSE` | `5` |
+| `MAX_SECONDS_TO_CLOSE` | `180` |
+
+Walk-forward search used 7 trailing days with the last 2 days held out for validation, `1000`
+USDC initial capital, and `100` USDC stake per trade. Historical validation result:
+`+2131.20` USDC, `407` trades, `84.77%` win rate. Full 7-day run with the selected profile:
+`+7128.44` USDC, `1404` trades, `83.83%` win rate. These figures are not live profit
+guarantees.
+
 ## Configuration
 
 Environment variables:

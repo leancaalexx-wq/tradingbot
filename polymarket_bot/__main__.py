@@ -9,7 +9,8 @@ from dotenv import load_dotenv
 from decimal import Decimal
 
 from .backtest import Backtester, print_report
-from .config import BotConfig
+from .config import BotConfig, apply_optimized_profile
+from .optimizer import StrategyOptimizer, print_optimization_report
 from .runner import BotRunner
 
 
@@ -33,6 +34,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="Run a historical backtest instead of live/paper polling.",
     )
     parser.add_argument(
+        "--optimize",
+        action="store_true",
+        help="Search strategy parameters on historical data and validate them out-of-sample.",
+    )
+    parser.add_argument(
+        "--optimized-profile",
+        action="store_true",
+        help="Use the bundled optimized BTC 5m profile from the latest walk-forward search.",
+    )
+    parser.add_argument(
         "--backtest-days",
         type=int,
         default=7,
@@ -43,6 +54,12 @@ def build_parser() -> argparse.ArgumentParser:
         type=float,
         default=1000.0,
         help="Initial USDC capital for backtests.",
+    )
+    parser.add_argument(
+        "--validation-days",
+        type=int,
+        default=2,
+        help="Trailing days reserved for optimizer validation.",
     )
     parser.add_argument(
         "--backtest-workers",
@@ -80,6 +97,8 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     config = BotConfig.from_env()
+    if args.optimized_profile:
+        config = apply_optimized_profile(config)
     if args.live:
         config = config.with_overrides(live_trading=True)
     if args.poll_seconds is not None:
@@ -95,6 +114,16 @@ def main(argv: list[str] | None = None) -> int:
             workers=args.backtest_workers,
         )
         print_report(report)
+        return 0
+
+    if args.optimize:
+        report = StrategyOptimizer(config).optimize(
+            days=args.backtest_days,
+            validation_days=args.validation_days,
+            initial_capital=Decimal(str(args.capital)),
+            workers=args.backtest_workers,
+        )
+        print_optimization_report(report)
         return 0
 
     runner = BotRunner(config)

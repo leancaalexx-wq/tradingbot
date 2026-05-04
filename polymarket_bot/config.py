@@ -21,6 +21,15 @@ def _int_env(name: str, default: str) -> int:
     return int(os.getenv(name, default))
 
 
+OPTIMIZED_PROFILE = {
+    "min_entry_price": Decimal("0.70"),
+    "max_entry_price": Decimal("0.90"),
+    "min_expected_profit_usdc": Decimal("0.05"),
+    "min_seconds_to_close": 5,
+    "max_seconds_to_close": 180,
+}
+
+
 @dataclass(frozen=True)
 class BotConfig:
     gamma_base_url: str = "https://gamma-api.polymarket.com"
@@ -72,6 +81,11 @@ class BotConfig:
         live_trading: bool | None = None,
         poll_seconds: float | None = None,
         stake_usdc: Decimal | None = None,
+        min_entry_price: Decimal | None = None,
+        max_entry_price: Decimal | None = None,
+        min_expected_profit_usdc: Decimal | None = None,
+        min_seconds_to_close: int | None = None,
+        max_seconds_to_close: int | None = None,
     ) -> "BotConfig":
         return replace(
             self,
@@ -79,6 +93,19 @@ class BotConfig:
             dry_run=self.dry_run if live_trading is None else not live_trading,
             poll_seconds=self.poll_seconds if poll_seconds is None else poll_seconds,
             stake_usdc=self.stake_usdc if stake_usdc is None else stake_usdc,
+            min_entry_price=self.min_entry_price if min_entry_price is None else min_entry_price,
+            max_entry_price=self.max_entry_price if max_entry_price is None else max_entry_price,
+            min_expected_profit_usdc=(
+                self.min_expected_profit_usdc
+                if min_expected_profit_usdc is None
+                else min_expected_profit_usdc
+            ),
+            min_seconds_to_close=(
+                self.min_seconds_to_close if min_seconds_to_close is None else min_seconds_to_close
+            ),
+            max_seconds_to_close=(
+                self.max_seconds_to_close if max_seconds_to_close is None else max_seconds_to_close
+            ),
         )
 
     def validate(self) -> None:
@@ -98,3 +125,7 @@ class BotConfig:
             raise ValueError("LIVE_TRADING=true requires DRY_RUN=false")
         if self.live_trading and (not self.private_key or not self.funder_address):
             raise ValueError("Live trading requires POLYMARKET_PRIVATE_KEY and POLYMARKET_FUNDER_ADDRESS")
+
+
+def apply_optimized_profile(config: BotConfig) -> BotConfig:
+    return config.with_overrides(**OPTIMIZED_PROFILE)
