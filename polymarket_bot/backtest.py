@@ -233,6 +233,8 @@ class Backtester:
                         seconds_to_close=(market.end_time - timestamp).total_seconds(),
                     )
                 )
+            if len(quotes) < 2:
+                continue
             intent = self.strategy.evaluate(market, tuple(quotes), now=timestamp)
             if intent is not None:
                 return intent

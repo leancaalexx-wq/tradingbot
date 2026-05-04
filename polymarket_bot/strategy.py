@@ -32,6 +32,9 @@ class SequentialLateEntryStrategy:
             return None
 
         price = Decimal(str(candidate.ask))
+        price_gap = self._price_gap(quotes)
+        if price_gap < self.config.min_price_gap:
+            return None
         if price < self.config.min_entry_price or price > self.config.max_entry_price:
             return None
 
@@ -51,6 +54,7 @@ class SequentialLateEntryStrategy:
             reason=(
                 f"{candidate.outcome_name} ask is {price:.4f}, within "
                 f"{self.config.min_entry_price:.2f}-{self.config.max_entry_price:.2f}, "
+                f"gap is {price_gap:.4f}, "
                 f"with {seconds_left:.1f}s left; gross profit if correct is about "
                 f"{expected_profit:.4f} USDC"
             ),
@@ -62,3 +66,10 @@ class SequentialLateEntryStrategy:
         if not candidates:
             return None
         return max(candidates, key=lambda quote: quote.ask)
+
+    @staticmethod
+    def _price_gap(quotes: tuple[Quote, ...]) -> Decimal:
+        prices = sorted((Decimal(str(quote.ask)) for quote in quotes), reverse=True)
+        if len(prices) < 2:
+            return Decimal("0")
+        return prices[0] - prices[1]

@@ -25,6 +25,7 @@ OPTIMIZED_PROFILE = {
     "min_entry_price": Decimal("0.70"),
     "max_entry_price": Decimal("0.90"),
     "min_expected_profit_usdc": Decimal("0.05"),
+    "min_price_gap": Decimal("0"),
     "min_seconds_to_close": 5,
     "max_seconds_to_close": 180,
 }
@@ -33,6 +34,16 @@ AGGRESSIVE_PROFILE = {
     "min_entry_price": Decimal("0.50"),
     "max_entry_price": Decimal("0.99"),
     "min_expected_profit_usdc": Decimal("0"),
+    "min_price_gap": Decimal("0"),
+    "min_seconds_to_close": 5,
+    "max_seconds_to_close": 180,
+}
+
+CHAMPION_PROFILE = {
+    "min_entry_price": Decimal("0.50"),
+    "max_entry_price": Decimal("0.90"),
+    "min_expected_profit_usdc": Decimal("0"),
+    "min_price_gap": Decimal("0.40"),
     "min_seconds_to_close": 5,
     "max_seconds_to_close": 180,
 }
@@ -46,6 +57,7 @@ class BotConfig:
     min_entry_price: Decimal = Decimal("0.80")
     max_entry_price: Decimal = Decimal("0.85")
     min_expected_profit_usdc: Decimal = Decimal("0.10")
+    min_price_gap: Decimal = Decimal("0")
     stake_usdc: Decimal = Decimal("1.00")
     min_seconds_to_close: int = 15
     max_seconds_to_close: int = 90
@@ -70,6 +82,7 @@ class BotConfig:
             min_expected_profit_usdc=_decimal_env(
                 "MIN_EXPECTED_PROFIT_USDC", str(cls.min_expected_profit_usdc)
             ),
+            min_price_gap=_decimal_env("MIN_PRICE_GAP", str(cls.min_price_gap)),
             stake_usdc=_decimal_env("STAKE_USDC", str(cls.stake_usdc)),
             min_seconds_to_close=_int_env("MIN_SECONDS_TO_CLOSE", str(cls.min_seconds_to_close)),
             max_seconds_to_close=_int_env("MAX_SECONDS_TO_CLOSE", str(cls.max_seconds_to_close)),
@@ -94,6 +107,7 @@ class BotConfig:
         min_entry_price: Decimal | None = None,
         max_entry_price: Decimal | None = None,
         min_expected_profit_usdc: Decimal | None = None,
+        min_price_gap: Decimal | None = None,
         min_seconds_to_close: int | None = None,
         max_seconds_to_close: int | None = None,
     ) -> "BotConfig":
@@ -110,6 +124,7 @@ class BotConfig:
                 if min_expected_profit_usdc is None
                 else min_expected_profit_usdc
             ),
+            min_price_gap=self.min_price_gap if min_price_gap is None else min_price_gap,
             min_seconds_to_close=(
                 self.min_seconds_to_close if min_seconds_to_close is None else min_seconds_to_close
             ),
@@ -125,6 +140,8 @@ class BotConfig:
             raise ValueError("STAKE_USDC must be positive")
         if self.min_expected_profit_usdc < 0:
             raise ValueError("MIN_EXPECTED_PROFIT_USDC cannot be negative")
+        if self.min_price_gap < 0:
+            raise ValueError("MIN_PRICE_GAP cannot be negative")
         if self.min_seconds_to_close < 0 or self.max_seconds_to_close <= self.min_seconds_to_close:
             raise ValueError("Close window must satisfy 0 <= MIN_SECONDS_TO_CLOSE < MAX_SECONDS_TO_CLOSE")
         if self.poll_seconds <= 0:
@@ -143,3 +160,7 @@ def apply_optimized_profile(config: BotConfig) -> BotConfig:
 
 def apply_aggressive_profile(config: BotConfig) -> BotConfig:
     return config.with_overrides(**AGGRESSIVE_PROFILE)
+
+
+def apply_champion_profile(config: BotConfig) -> BotConfig:
+    return config.with_overrides(**CHAMPION_PROFILE)

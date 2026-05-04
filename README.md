@@ -118,6 +118,33 @@ polymarket-btc-bot --aggressive-profile --backtest --backtest-days 7 --capital 1
 polymarket-btc-bot --aggressive-profile --stake 100
 ```
 
+The current champion profile from the broad strategy search adds a minimum price-gap filter between
+the favored side and the other side:
+
+```bash
+polymarket-btc-bot --champion-profile --backtest --backtest-days 7 --capital 1000 --stake 100
+polymarket-btc-bot --champion-profile --stake 100
+```
+
+Champion profile:
+
+| Setting | Value |
+| --- | --- |
+| `MIN_ENTRY_PRICE` | `0.50` |
+| `MAX_ENTRY_PRICE` | `0.90` |
+| `MIN_EXPECTED_PROFIT_USDC` | `0` |
+| `MIN_PRICE_GAP` | `0.40` |
+| `MIN_SECONDS_TO_CLOSE` | `5` |
+| `MAX_SECONDS_TO_CLOSE` | `180` |
+
+7-day champion backtest with 1000 USDC starting capital and 100 USDC stake:
+
+- Final capital: 11723.21 USDC.
+- PnL: +10723.21 USDC.
+- Trades: 1436.
+- Wins/losses: 1208/228.
+- Win rate: 84.12%.
+
 Bundled aggressive profile:
 
 | Setting | Value |
@@ -125,6 +152,7 @@ Bundled aggressive profile:
 | `MIN_ENTRY_PRICE` | `0.50` |
 | `MAX_ENTRY_PRICE` | `0.99` |
 | `MIN_EXPECTED_PROFIT_USDC` | `0` |
+| `MIN_PRICE_GAP` | `0` |
 | `MIN_SECONDS_TO_CLOSE` | `5` |
 | `MAX_SECONDS_TO_CLOSE` | `180` |
 
@@ -177,6 +205,7 @@ Environment variables:
 | `MIN_ENTRY_PRICE` | `0.80` | Lowest acceptable favored-side ask |
 | `MAX_ENTRY_PRICE` | `0.85` | Highest acceptable favored-side ask |
 | `MIN_EXPECTED_PROFIT_USDC` | `0.10` | Gross profit filter if the outcome resolves correct |
+| `MIN_PRICE_GAP` | `0` | Minimum gap between the favored side and the next best side |
 | `STAKE_USDC` | `1.00` | USDC stake per market |
 | `MIN_SECONDS_TO_CLOSE` | `15` | Do not enter in the final seconds below this threshold |
 | `MAX_SECONDS_TO_CLOSE` | `90` | Start looking only this close to market expiry |

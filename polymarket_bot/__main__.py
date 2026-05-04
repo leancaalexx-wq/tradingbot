@@ -9,7 +9,12 @@ from dotenv import load_dotenv
 from decimal import Decimal
 
 from .backtest import Backtester, print_report
-from .config import BotConfig, apply_aggressive_profile, apply_optimized_profile
+from .config import (
+    BotConfig,
+    apply_aggressive_profile,
+    apply_champion_profile,
+    apply_optimized_profile,
+)
 from .dashboard import run_dashboard
 from .optimizer import StrategyOptimizer, print_optimization_report
 from .runner import BotRunner
@@ -48,6 +53,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--aggressive-profile",
         action="store_true",
         help="Use the high-frequency profile that aims to enter almost every BTC 5m market.",
+    )
+    parser.add_argument(
+        "--champion-profile",
+        action="store_true",
+        help="Use the best validation-tested profile from the broad strategy search.",
     )
     parser.add_argument(
         "--dashboard",
@@ -119,12 +129,21 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     config = BotConfig.from_env()
-    if args.optimized_profile and args.aggressive_profile:
-        raise SystemExit("Choose only one of --optimized-profile or --aggressive-profile")
+    selected_profiles = [
+        args.optimized_profile,
+        args.aggressive_profile,
+        args.champion_profile,
+    ]
+    if sum(1 for selected in selected_profiles if selected) > 1:
+        raise SystemExit(
+            "Choose only one of --optimized-profile, --aggressive-profile, or --champion-profile"
+        )
     if args.optimized_profile:
         config = apply_optimized_profile(config)
     if args.aggressive_profile:
         config = apply_aggressive_profile(config)
+    if args.champion_profile:
+        config = apply_champion_profile(config)
     if args.live:
         config = config.with_overrides(live_trading=True)
     if args.poll_seconds is not None:
