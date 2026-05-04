@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 
 from decimal import Decimal
 
+from .backtest import Backtester, print_report
 from .config import BotConfig
 from .runner import BotRunner
 
@@ -25,6 +26,29 @@ def build_parser() -> argparse.ArgumentParser:
         "--once",
         action="store_true",
         help="Run one evaluation cycle and exit.",
+    )
+    parser.add_argument(
+        "--backtest",
+        action="store_true",
+        help="Run a historical backtest instead of live/paper polling.",
+    )
+    parser.add_argument(
+        "--backtest-days",
+        type=int,
+        default=7,
+        help="Number of trailing days to backtest.",
+    )
+    parser.add_argument(
+        "--capital",
+        type=float,
+        default=1000.0,
+        help="Initial USDC capital for backtests.",
+    )
+    parser.add_argument(
+        "--backtest-workers",
+        type=int,
+        default=16,
+        help="Concurrent workers for fetching historical backtest prices.",
     )
     parser.add_argument(
         "--poll-seconds",
@@ -63,6 +87,15 @@ def main(argv: list[str] | None = None) -> int:
     if args.stake is not None:
         config = config.with_overrides(stake_usdc=Decimal(str(args.stake)))
     config.validate()
+
+    if args.backtest:
+        report = Backtester(config).run(
+            days=args.backtest_days,
+            initial_capital=Decimal(str(args.capital)),
+            workers=args.backtest_workers,
+        )
+        print_report(report)
+        return 0
 
     runner = BotRunner(config)
     runner.run(once=args.once)

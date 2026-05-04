@@ -36,6 +36,22 @@ polymarket-btc-bot --once
 polymarket-btc-bot --stake 1 --poll-seconds 5
 ```
 
+## Backtest
+
+Run the same entry rules against recent resolved BTC 5-minute markets:
+
+```bash
+polymarket-btc-bot --backtest --backtest-days 7 --capital 1000
+```
+
+The backtest uses Gamma for resolved markets and CLOB `/prices-history` at 1-minute fidelity for
+historical prices inside the configured late-entry window. Treat the result as an approximation:
+historical price points are not full order-book snapshots and do not guarantee that the displayed
+size was fillable at that price.
+
+Use `--backtest-workers` to control concurrent historical price requests if the API is slow or
+rate-limited.
+
 ## Configuration
 
 Environment variables:
