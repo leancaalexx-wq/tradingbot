@@ -110,6 +110,28 @@ polymarket-btc-bot --optimized-profile --backtest --backtest-days 7 --capital 10
 polymarket-btc-bot --optimized-profile --stake 100
 ```
 
+High-frequency profile for entering almost every BTC 5-minute market during the final three
+minutes:
+
+```bash
+polymarket-btc-bot --aggressive-profile --backtest --backtest-days 7 --capital 1000 --stake 100
+polymarket-btc-bot --aggressive-profile --stake 100
+```
+
+Bundled aggressive profile:
+
+| Setting | Value |
+| --- | --- |
+| `MIN_ENTRY_PRICE` | `0.50` |
+| `MAX_ENTRY_PRICE` | `0.99` |
+| `MIN_EXPECTED_PROFIT_USDC` | `0` |
+| `MIN_SECONDS_TO_CLOSE` | `5` |
+| `MAX_SECONDS_TO_CLOSE` | `180` |
+
+Development 7-day backtest with 1000 USDC starting capital and 100 USDC stake: +4828.00 USDC,
+2007 trades, 72.80% win rate. A wider 5-minute window (`MAX_SECONDS_TO_CLOSE=300`) was rejected
+because it lost most of the test capital.
+
 Bundled profile:
 
 | Setting | Value |

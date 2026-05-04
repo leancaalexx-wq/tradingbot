@@ -29,6 +29,14 @@ OPTIMIZED_PROFILE = {
     "max_seconds_to_close": 180,
 }
 
+AGGRESSIVE_PROFILE = {
+    "min_entry_price": Decimal("0.50"),
+    "max_entry_price": Decimal("0.99"),
+    "min_expected_profit_usdc": Decimal("0"),
+    "min_seconds_to_close": 5,
+    "max_seconds_to_close": 180,
+}
+
 
 @dataclass(frozen=True)
 class BotConfig:
@@ -131,3 +139,7 @@ class BotConfig:
 
 def apply_optimized_profile(config: BotConfig) -> BotConfig:
     return config.with_overrides(**OPTIMIZED_PROFILE)
+
+
+def apply_aggressive_profile(config: BotConfig) -> BotConfig:
+    return config.with_overrides(**AGGRESSIVE_PROFILE)
