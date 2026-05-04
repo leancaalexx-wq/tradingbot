@@ -14,17 +14,20 @@ class GammaClient:
         self._base_url = base_url.rstrip("/")
         self._series_slug = series_slug
         self._timeout_seconds = timeout_seconds
+        self._series_id_cache: str | None = None
 
     def current_market(self) -> Market:
+        now = datetime.now(UTC)
         response = requests.get(
             f"{self._base_url}/events",
             params={
-                "slug": self._series_slug,
+                "series_id": self.series_id(),
                 "active": "true",
                 "closed": "false",
                 "limit": "25",
                 "order": "endDate",
                 "ascending": "true",
+                "end_date_min": _format_datetime(now),
             },
             timeout=self._timeout_seconds,
         )
@@ -33,7 +36,6 @@ class GammaClient:
         if isinstance(events, dict):
             events = events.get("events") or events.get("data") or []
 
-        now = datetime.now(UTC)
         markets: list[Market] = []
         for event in events:
             for raw_market in event.get("markets") or []:
@@ -46,6 +48,8 @@ class GammaClient:
         return min(markets, key=lambda market: market.end_time)
 
     def series_id(self) -> str:
+        if self._series_id_cache is not None:
+            return self._series_id_cache
         response = requests.get(
             f"{self._base_url}/series",
             params={"slug": self._series_slug},
@@ -55,7 +59,8 @@ class GammaClient:
         series = response.json()
         if not series:
             raise RuntimeError(f"No Gamma series found for slug {self._series_slug!r}.")
-        return str(series[0]["id"])
+        self._series_id_cache = str(series[0]["id"])
+        return self._series_id_cache
 
     def closed_events(
         self,
