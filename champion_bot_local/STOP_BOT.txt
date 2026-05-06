@@ -1,0 +1,13 @@
+Ca sa opresti botul:
+
+1. Mergi in fereastra in care ruleaza botul.
+2. Apasa:
+
+   Ctrl + C
+
+3. Daca ruleaza dashboard-ul, inchide fereastra Dashboard sau apasa Ctrl + C acolo.
+
+Important:
+- Paper mode nu foloseste bani reali.
+- Live mode foloseste bani reali.
+- Daca nu esti sigur, opreste botul.
